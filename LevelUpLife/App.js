@@ -1,11 +1,13 @@
+import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, KeyboardAvoidingView, TextInput, Button } from 'react-native';
 import Age from './src/components/age/age';
-import { createStackNavigator } from 'react-navigation-stack';
-import { createAppContainer } from 'react-navigation'
+//import { createStackNavigator } from 'react-navigation-stack';
+//import { createAppContainer } from 'react-navigation';
 
-
+/*
 const AppColor = "#FFB7C3";
+
 
 
 const AppStackNavigator = createStackNavigator(
@@ -25,28 +27,32 @@ const AppStackNavigator = createStackNavigator(
       color: '#fff',
     },
   },
-
- 
 },
 );
 
 const TempApp = createAppContainer(AppStackNavigator);
-
-export default class App extends Component {
+*/
+/* export default class App extends Component {
     componentDidMount(){
       init();
     }
   render () {
     return (
-      <TempApp/>
+      <h1>hello world</h1>
     );
   }
+} */
+
+export default function App() {
+  return (
+    <Age></Age>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#eee',
     alignItems: 'center',
     justifyContent: 'center',
   },

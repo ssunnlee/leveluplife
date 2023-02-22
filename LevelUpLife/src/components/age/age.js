@@ -1,33 +1,57 @@
-import { styleSheets } from 'min-document';
 import React, { Component} from 'react';
 import {StyleSheet, View, Image, Text, KeyboardAvoidingView, Button, TextInput} from 'react-native';
-import AgeForm from './ageForm';
-import {db} from '../../config/global.js'
-import * as firebase from 'firebase';
+//import AgeForm from './ageForm';
+//import {db} from '../../config/global.js'
+
 
 export default class Age extends Component {
     constructor(props){
         super(props)
         this.state = ({
-            age:''
+            age:'',
+            name:'',
+            weight:0
         })
     }
-    recordAge = (age) => {
+    /* recordAge = (age) => {
         db.doc(user.email).set({
             ageID: age},
             { merge: true });
-        this.props.navigation.navigate('Occupation');
+        this.props.navigation.navigate('Occupation'); 
 
+    }*/
+    recordData = (name, age, weight) => {
+        console.log("User name is " + name);
+        console.log("User age is " + age);
+        console.log("User weight is " + weight);
     }
+
     render(){
         return (
             <KeyboardAvoidingView behavior = "padding" style = {styles.container}>
                 <View style = {styles.formContainer}>
                     <View style = {styles.ageFormContainer}>
                         <TextInput
+                            placeholder = "Name"
+                            returnKeyType = "next"
+                            onChangeText={(name)=>this.setState({name})}
+                            style = {styles.input}
+                            autoCapitalize = "words"
+                            autoCorrect = {false}
+                        />
+                        <TextInput
                             placeholder = "Age"
                             returnKeyType = "go"
                             onChangeText={(age)=>this.setState({age})}
+                            style = {styles.input}
+                            autoCapitalize = "none"
+                            autoCorrect = {false}
+                            keyboardType="numeric"
+                        />
+                        <TextInput
+                            placeholder = "Weight"
+                            returnKeyType = "go"
+                            onChangeText={(weight)=>this.setState({weight})}
                             style = {styles.input}
                             autoCapitalize = "none"
                             autoCorrect = {false}
@@ -38,7 +62,7 @@ export default class Age extends Component {
                         <Button
                             title = "Next"
                             color = "#3C6435"
-                            onPress={() => this.recordAge(this.state.age)}
+                            onPress={() => this.recordData(this.state.name, this.state.age, this.state.weight)}
                         />
                     </View>
                 </View>
@@ -67,6 +91,7 @@ const styles = StyleSheet.create({
     },
 
     ageFormContainer: {
+        marginTop: 50,
         padding: 20,
     },
 
