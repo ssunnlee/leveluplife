@@ -1,14 +1,46 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import Age from './src/components/age/age';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createAppContainer } from 'react-navigation'
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <Text>Another line for test</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+
+const AppColor = "#FFB7C3";
+
+
+const AppStackNavigator = createStackNavigator(
+{
+  Age: {screen: Age, navigationOptions: {headerLeft: () => null}},
+},
+
+{
+  initialRouteName: 'Age',
+
+  defaultNavigationOptions: {
+    headerStyle: {
+      backgroundColor: AppColor,
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      color: '#fff',
+    },
+  },
+
+ 
+},
+);
+
+const TempApp = createAppContainer(AppStackNavigator);
+
+export default class App extends Component {
+    componentDidMount(){
+      init();
+    }
+  render () {
+    return (
+      <TempApp/>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
