@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, KeyboardAvoidingView, TextInput, Button } from 'react-native';
-import Age from './src/components/age/age';
+import Info from './src/components/info/info';
 import Home from './src/components/home/home';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -33,7 +33,7 @@ const AppStackNavigator = createStackNavigator(
 );
 */
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator();
 
 //function MyApp
 
@@ -54,8 +54,8 @@ export default function App() {
   return (
     <NavigationContainer>
     <Stack.Navigator>
+      <Stack.Screen name="Info" component = {Info}/>
       <Stack.Screen name="Home" component = {Home}/>
-      <Stack.Screen name="Register" component = {Age}/>
     </Stack.Navigator>
     </NavigationContainer>
   );

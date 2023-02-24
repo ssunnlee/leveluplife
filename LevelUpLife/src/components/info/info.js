@@ -4,13 +4,14 @@ import {StyleSheet, View, Image, Text, KeyboardAvoidingView, Button, TextInput} 
 //import {db} from '../../config/global.js'
 
 
-export default class Age extends Component {
+export default class Info extends Component {
     constructor(props){
         super(props)
         this.state = ({
             age:'',
             name:'',
-            weight:0
+            weight:0,
+            height:0,
         })
     }
     /* recordAge = (age) => {
@@ -20,10 +21,11 @@ export default class Age extends Component {
         this.props.navigation.navigate('Occupation'); 
 
     }*/
-    recordData = (name, age, weight) => {
+    recordData = (name, age, weight, height) => {
         console.log("User name is " + name);
         console.log("User age is " + age);
         console.log("User weight is " + weight);
+        console.log("User height is " + height);
         this.props.navigation.navigate("Home");
     }
 
@@ -32,7 +34,7 @@ export default class Age extends Component {
             <KeyboardAvoidingView behavior = "padding" style = {styles.container}>
                 <View style = {styles.formContainer}>
                     <Text style={styles.title}>Welcome to LevelUpLife</Text>
-                    <View style = {styles.ageFormContainer}>
+                    <View style = {styles.InfoFormContainer}>
                         <TextInput
                             placeholder = "Name"
                             returnKeyType = "next"
@@ -51,9 +53,18 @@ export default class Age extends Component {
                             keyboardType="numeric"
                         />
                         <TextInput
-                            placeholder = "Weight"
-                            returnKeyType = "go"
+                            placeholder = "Weight (in kilograms)"
+                            returnKeyType = "next"
                             onChangeText={(weight)=>this.setState({weight})}
+                            style = {styles.input}
+                            autoCapitalize = "none"
+                            autoCorrect = {false}
+                            keyboardType="numeric"
+                        />
+                        <TextInput
+                            placeholder = "Height (in meters)"
+                            returnKeyType = "go"
+                            onChangeText={(height)=>this.setState({height})}
                             style = {styles.input}
                             autoCapitalize = "none"
                             autoCorrect = {false}
@@ -64,7 +75,7 @@ export default class Age extends Component {
                         <Button
                             title = "Next"
                             color = "#3C6435"
-                            onPress={() => this.recordData(this.state.name, this.state.age, this.state.weight)}
+                            onPress={() => this.recordData(this.state.name, this.state.age, this.state.weight, this.state.height)}
                         />
                     </View>
                 </View>
@@ -92,7 +103,7 @@ const styles = StyleSheet.create({
         fontSize: 30,
     },
 
-    ageFormContainer: {
+    InfoFormContainer: {
         marginTop: 50,
         padding: 20,
     },
