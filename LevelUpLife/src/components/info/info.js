@@ -12,6 +12,7 @@ export default class Info extends Component {
             name:'',
             weight:0,
             height:0,
+            gender:''
         })
     }
     /* recordAge = (age) => {
@@ -21,11 +22,12 @@ export default class Info extends Component {
         this.props.navigation.navigate('Occupation'); 
 
     }*/
-    recordData = (name, age, weight, height) => {
+    recordData = (name, age, weight, height, gender) => {
         console.log("User name is " + name);
         console.log("User age is " + age);
         console.log("User weight is " + weight);
         console.log("User height is " + height);
+        console.log("User gender is " + gender);
         this.props.navigation.navigate("Home");
     }
 
@@ -63,19 +65,28 @@ export default class Info extends Component {
                         />
                         <TextInput
                             placeholder = "Height (in meters)"
-                            returnKeyType = "go"
+                            returnKeyType = "next"
                             onChangeText={(height)=>this.setState({height})}
                             style = {styles.input}
                             autoCapitalize = "none"
                             autoCorrect = {false}
                             keyboardType="numeric"
                         />
+                        <TextInput
+                            placeholder = "Gender (Male or Female)"
+                            returnKeyType = "go"
+                            onChangeText={(gender)=>this.setState({gender})}
+                            style = {styles.input}
+                            autoCapitalize = "none"
+                            autoCorrect = {false}
+                            keyboardType="words"
+                        />
                     </View>
                     <View style={{borderRadius: 20, width:  120, height:  50, alignSelf: 'center'  , marginBottom:  20, backgroundColor:  'white' , borderWidth:  2, justifyContent:  'center', textAlign:  'center', margin:  10}}>
                         <Button
                             title = "Next"
                             color = "#3C6435"
-                            onPress={() => this.recordData(this.state.name, this.state.age, this.state.weight, this.state.height)}
+                            onPress={() => this.recordData(this.state.name, this.state.age, this.state.weight, this.state.height, this.state.gender)}
                         />
                     </View>
                 </View>
