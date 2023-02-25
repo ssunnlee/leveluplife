@@ -1,5 +1,6 @@
 import React, { Component} from 'react';
 import {StyleSheet, View, Image, Text, KeyboardAvoidingView, Button, TextInput} from 'react-native';
+import {initCounter, initThresholds, updateUserModel} from '../firebase/firebaseConfig'
 //import AgeForm from './ageForm';
 //import {db} from '../../config/global.js'
 
@@ -23,11 +24,14 @@ export default class Info extends Component {
 
     }*/
     recordData = (name, age, weight, height, gender) => {
+        initCounter();
+        initThresholds();
         console.log("User name is " + name);
         console.log("User age is " + age);
-        console.log("User weight is " + weight);
         console.log("User height is " + height);
+        console.log("User weight is " + weight);
         console.log("User gender is " + gender);
+        updateUserModel(name, age, height, weight, gender);
         this.props.navigation.navigate("Home");
     }
 

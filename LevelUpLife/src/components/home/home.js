@@ -1,5 +1,6 @@
 import React, { Component} from 'react';
-import {StyleSheet, View, Image, Text, KeyboardAvoidingView, Button, TextInput} from 'react-native';
+import {StyleSheet, View, Image, Text, KeyboardAvoidingView, Button, TextInput, Alert} from 'react-native';
+import {userIntake} from '../firebase/firebaseConfig';
 //import AgeForm from './ageForm';
 //import {db} from '../../config/global.js'
 
@@ -8,14 +9,19 @@ export default class Home extends Component {
     constructor(props){
         super(props)
         this.state = ({
-            age:'',
-            name:'',
-            weight:0
+            fat:0,
+            protein:0,
+            carbs:0,
+            ch:0,
+            cal:0
         })
     }
 
-    recordData = () => {
-        this.props.navigation.goBack();
+    recordData = async (fat, protein, carbs, ch, cal) => {
+        const st = await userIntake(fat, protein, carbs, parseInt(ch), cal);
+        console.log(st);
+        Alert.alert("Notification", st);
+        //this.props.navigation.goBack();
     }
 
     render(){
@@ -25,19 +31,20 @@ export default class Home extends Component {
                     <Text style={styles.title}>Welcome to LevelUpLife</Text>
                     <View style = {styles.ageFormContainer}>
                         <TextInput
-                            placeholder = "Test"
-                            returnKeyType = "next"
-                            onChangeText={(name)=>this.setState({name})}
+                            placeholder = "Cholesterol (in mg)"
+                            returnKeyType = "go"
+                            onChangeText={(ch)=>this.setState({ch})}
                             style = {styles.input}
                             autoCapitalize = "words"
                             autoCorrect = {false}
+                            keyboardType = 'numeric'
                         />
                     </View>
                     <View style={{ borderRadius:  20 ,width:  120, height:  50, alignSelf: 'center'  , marginBottom:  20, backgroundColor:  'white' , borderWidth:  2, justifyContent:  'center', textAlign:  'center', margin:  10}}>
                         <Button
                             title = "Next"
                             color = "#3C6435"
-                            onPress={() => this.recordData()}
+                            onPress={() => this.recordData(this.state.fat, this.state.protein, this.state.carbs, this.state.ch, this.state.cal)}
                         />
                     </View>
                 </View>
