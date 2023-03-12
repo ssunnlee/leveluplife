@@ -1,27 +1,25 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
-import { userIntake } from '../firebase/firebaseConfig';
-//import AgeForm from './ageForm';
-//import {db} from '../../config/global.js'
+import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
 
 
-export default class Home extends Component {
+export default class Login extends Component {
     constructor(props) {
         super(props)
         this.state = ({
-            fat: 0,
-            protein: 0,
-            carbs: 0,
-            ch: 0,
-            cal: 0
+            username: '',
+            password: ''
         })
     }
-
-    recordData = async (fat, protein, carbs, ch, cal) => {
-        const st = await userIntake(fat, protein, carbs, parseInt(ch), cal);
-        console.log(st);
-        Alert.alert("Notification", st);
-        //this.props.navigation.goBack();
+    attemptLogin = (username, password) => {
+        console.log("Username is " + username);
+        // TODO: authentification logic
+        if (password == "test") {
+            this.props.navigation.navigate("Home");
+        } else {
+            Alert.alert('Login', 'Login information is incorrect', [
+                { text: 'OK' },
+            ]);
+        }
     }
 
     render() {
@@ -29,22 +27,28 @@ export default class Home extends Component {
             <KeyboardAvoidingView behavior="padding" style={styles.container}>
                 <View style={styles.formContainer}>
                     <Text style={styles.title}>Welcome to LevelUpLife</Text>
-                    <View style={styles.ageFormContainer}>
+                    <View style={styles.InfoFormContainer}>
                         <TextInput
-                            placeholder="Cholesterol (in mg)"
-                            returnKeyType="go"
-                            onChangeText={(ch) => this.setState({ ch })}
+                            placeholder="Username"
+                            returnKeyType="next"
+                            onChangeText={(username) => this.setState({ username })}
                             style={styles.input}
-                            autoCapitalize="words"
+                            autoCapitalize="none"
                             autoCorrect={false}
-                            keyboardType='numeric'
+                        />
+                        <TextInput
+                            placeholder="Password"
+                            returnKeyType="go"
+                            onChangeText={(password) => this.setState({ password })}
+                            style={styles.input}
+                            secureTextEntry={true}
                         />
                     </View>
                     <View style={{ borderRadius: 20, width: 120, height: 50, alignSelf: 'center', marginBottom: 20, backgroundColor: 'white', borderWidth: 2, justifyContent: 'center', textAlign: 'center', margin: 10 }}>
                         <Button
-                            title="Next"
+                            title="Login"
                             color="#3C6435"
-                            onPress={() => this.recordData(this.state.fat, this.state.protein, this.state.carbs, this.state.ch, this.state.cal)}
+                            onPress={() => this.attemptLogin(this.state.username, this.state.password)}
                         />
                     </View>
                 </View>
@@ -72,7 +76,7 @@ const styles = StyleSheet.create({
         fontSize: 30,
     },
 
-    ageFormContainer: {
+    InfoFormContainer: {
         marginTop: 50,
         padding: 20,
     },

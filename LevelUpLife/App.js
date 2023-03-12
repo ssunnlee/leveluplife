@@ -3,6 +3,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, KeyboardAvoidingView, TextInput, Button } from 'react-native';
 import Info from './src/components/info/info';
 import Home from './src/components/home/home';
+import Index from './src/components/index/index';
+import Login from './src/components/login/login';
+import Register from './src/components/register/register';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -11,27 +14,6 @@ import { NavigationContainer } from '@react-navigation/native';
 const AppColor = "#FFB7C3";
 
 
-/*
-const AppStackNavigator = createStackNavigator(
-{
-  Age: {screen: Age, navigationOptions: {headerLeft: () => null}},
-},
-
-{
-  initialRouteName: 'Age',
-
-  defaultNavigationOptions: {
-    headerStyle: {
-      backgroundColor: AppColor,
-    },
-    headerTintColor: '#fff',
-    headerTitleStyle: {
-      color: '#fff',
-    },
-  },
-},
-);
-*/
 
 const Stack = createStackNavigator();
 
@@ -53,10 +35,13 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-    <Stack.Navigator>
-      <Stack.Screen name="Info" component = {Info}/>
-      <Stack.Screen name="Home" component = {Home}/>
-    </Stack.Navigator>
+      <Stack.Navigator>
+        <Stack.Screen name="Index" component={Index} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="Info" component={Info} />
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
