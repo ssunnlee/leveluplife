@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput } from 'react-native';
 import { initCounter, initThresholds, updateUserModel } from '../firebase/firebaseConfig'
-//import AgeForm from './ageForm';
-//import {db} from '../../config/global.js'
-
 
 export default class Info extends Component {
     constructor(props) {
         super(props)
         this.state = ({
+            username: 'test',
             age: '',
             name: '',
             weight: 0,
@@ -16,22 +14,16 @@ export default class Info extends Component {
             gender: ''
         })
     }
-    /* recordAge = (age) => {
-        db.doc(user.email).set({
-            ageID: age},
-            { merge: true });
-        this.props.navigation.navigate('Occupation'); 
 
-    }*/
     recordData = (name, age, weight, height, gender) => {
-        initCounter();
+        initCounter(this.state.username);
         initThresholds();
         console.log("User name is " + name);
         console.log("User age is " + age);
         console.log("User height is " + height);
         console.log("User weight is " + weight);
         console.log("User gender is " + gender);
-        updateUserModel(name, age, height, weight, gender);
+        updateUserModel(this.state.username, name, age, height, weight, gender);
         this.props.navigation.navigate("Home");
     }
 

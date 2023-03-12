@@ -1,24 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
-import { initCounter, initThresholds, updateUserModel } from '../firebase/firebaseConfig'
 
 
 export default class Index extends Component {
     constructor(props) {
         super(props)
-        this.state = ({
-        })
-    }
-    recordData = (name, age, weight, height, gender) => {
-        initCounter();
-        initThresholds();
-        console.log("User name is " + name);
-        console.log("User age is " + age);
-        console.log("User height is " + height);
-        console.log("User weight is " + weight);
-        console.log("User gender is " + gender);
-        updateUserModel(name, age, height, weight, gender);
-        this.props.navigation.navigate("Home");
     }
 
     render() {

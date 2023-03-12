@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
 import { userIntake } from '../firebase/firebaseConfig';
 //import AgeForm from './ageForm';
 //import {db} from '../../config/global.js'
@@ -9,6 +9,7 @@ export default class Home extends Component {
     constructor(props) {
         super(props)
         this.state = ({
+            username: "test",
             fat: 0,
             protein: 0,
             carbs: 0,
@@ -18,7 +19,7 @@ export default class Home extends Component {
     }
 
     recordData = async (fat, protein, carbs, ch, cal) => {
-        const st = await userIntake(fat, protein, carbs, parseInt(ch), cal);
+        const st = await userIntake(this.state.username, fat, protein, carbs, parseInt(ch), cal);
         console.log(st);
         Alert.alert("Notification", st);
         //this.props.navigation.goBack();

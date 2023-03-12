@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, apps } from "firebase/app";
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -17,6 +17,7 @@ import {
 // import {...} from "firebase/storage";
 
 // Initialize Firebase
+/*
 const firebaseConfig = {
   databaseURL: "https://test-ab3dd-default-rtdb.firebaseio.com/",
   apiKey: "AIzaSyBvGI-21RbaaJ4CWaxkfQhh-FpTEtI-87Y",
@@ -27,12 +28,24 @@ const firebaseConfig = {
   appId: "1:102948445889:web:6c8477824c7364071bfe40",
   measurementId: "G-0Q9XWFH28T",
 };
+*/
 
-export const initCounter = () => {
+// Conner's firebase config
+const firebaseConfig = {
+  databaseURL: "https://leveluplife-81ced-default-rtdb.firebaseio.com/",
+  apiKey: "AIzaSyDgc_JdtnDkO5-8UbRZwQV_cVUtDY7AOok",
+  authDomain: "leveluplife-81ced.firebaseapp.com",
+  projectId: "leveluplife-81ced",
+  storageBucket: "leveluplife-81ced.appspot.com",
+  messagingSenderId: "453247823364",
+  appId: "1:453247823364:web:7779eb606f763a76150f51"
+};
+
+export const initCounter = (username) => {
   console.log("initCounter called");
   const db = database;
 
-  set(ref(db, "counter/"), {
+  set(ref(db, "counter/" + username), {
     firstIntake: 0,
     dayCounter: 0,
     currentDay: 0,
@@ -62,11 +75,11 @@ export const initThresholds = () => {
   });
 };
 
-export const updateUserModel = (name, age, height, weight, gender) => {
+export const updateUserModel = (username, name, age, height, weight, gender) => {
   console.log("updateUserModel called");
   const db = database;
   const bmi = weight / Math.pow(height, 2);
-  set(ref(db, "userParams/"), {
+  set(ref(db, "userParams/" + username), {
     name: name,
     age: age,
     height: height,
@@ -76,7 +89,18 @@ export const updateUserModel = (name, age, height, weight, gender) => {
   });
 };
 
-const userIntakerHelper = async (section) => {
+const userIntakerHelper = async (section, username) => {
+  try {
+    var db = database;
+    const snapshot = await get(child(ref(db), `${section}/` + username));
+    const data = snapshot.val();
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const thresholdsHelper = async (section) => {
   try {
     var db = database;
     const snapshot = await get(child(ref(db), `${section}/`));
@@ -85,13 +109,13 @@ const userIntakerHelper = async (section) => {
   } catch (error) {
     console.error(error);
   }
-};
+}
 
-const checkThresholds = async () => {
-  var counter = await userIntakerHelper("counter");
-  const intakes = await userIntakerHelper("intakes");
-  const thresholds = await userIntakerHelper("thresholds");
-  const userParams = await userIntakerHelper("userParams");
+const checkThresholds = async (username) => {
+  var counter = await userIntakerHelper("counter", username);
+  const intakes = await userIntakerHelper("intakes", username);
+  const thresholds = await thresholdsHelper("thresholds");
+  const userParams = await userIntakerHelper("userParams", username);
   var recString = "Recommendations:\n";
   counter = counter.dayCounter;
   const bmiString = convertBmiToString(userParams.bmi);
@@ -102,9 +126,8 @@ const checkThresholds = async () => {
           "You have exceeded the recommended daily amount of cholesterol(300mg)\n"
         );
       } else if (intakeAmt[counter] > thresholds[bmiString][intakeType] * 0.8) {
-          recString = recString.concat(
-          `You have exceeded 80% of the recommended daily amount of cholesterol(${
-            thresholds[bmiString][intakeType] * 0.8
+        recString = recString.concat(
+          `You have exceeded 80% of the recommended daily amount of cholesterol(${thresholds[bmiString][intakeType] * 0.8
           }mg)\n`
         );
       }
@@ -122,6 +145,7 @@ const checkThresholds = async () => {
 };
 
 export const userIntake = async (
+  username,
   fat,
   protein,
   carbs,
@@ -134,38 +158,36 @@ export const userIntake = async (
   var initIntake = 0;
   var dayCounter = 0;
 
-  const data = await userIntakerHelper("counter");
+  const data = await userIntakerHelper("counter", username);
   initIntake = data.firstIntake;
   dayCounter = data.dayCounter;
 
+  const currentDay = new Date().getDate();
+
   if (initIntake == 0) {
-    const date = new Date();
-    const currentDay = date.getDate();
-    set(ref(db, "counter/"), {
+    // TODO: fix date system, currently rewrites over data every month
+    set(ref(db, "counter/" + username), {
       firstIntake: 0,
       dayCounter: 0,
       currentDay: currentDay,
     });
 
-    set(ref(db, "intakes/"), {
+    set(ref(db, "intakes/" + username), {
       fat: { [dayCounter]: fat },
       protein: { [dayCounter]: protein },
       carbs: { [dayCounter]: carbs },
       cholesterol: { [dayCounter]: cholesterol },
       calories: { [dayCounter]: calories },
     });
-    set(ref(db, "counter/"), {
+    set(ref(db, "counter/" + username), {
       dayCounter: 0,
       firstIntake: 1,
       currentDay: currentDay,
     });
   } else {
-    const date = new Date();
-    const currentDay = date.getDate();
-
-    const currentDayData = await userIntakerHelper("counter");
+    const currentDayData = await userIntakerHelper("counter", username);
     if (currentDayData.currentDay != currentDay) {
-      set(ref(db, "counter/"), {
+      set(ref(db, "counter/ + username"), {
         dayCounter: currentDayData.dayCounter + 1,
         firstIntake: 1,
         currentDay: currentDay,
@@ -173,7 +195,7 @@ export const userIntake = async (
       dayCounter = currentDayData.dayCounter + 1;
     }
 
-    get(child(ref(db), `intakes/`))
+    get(child(ref(db), "intakes/" + username))
       .then((snapshot) => {
         if (snapshot.exists()) {
           for (var [key, value] of Object.entries(snapshot.val())) {
@@ -196,7 +218,7 @@ export const userIntake = async (
       });
   }
 
-  const res = await checkThresholds();
+  const res = await checkThresholds(username);
   return res;
 };
 
