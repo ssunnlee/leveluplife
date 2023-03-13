@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, KeyboardAvoidingView, TextInput, Button } from 'react-native';
+import React, { createContext, useState } from 'react';
 import Info from './src/components/info/info';
 import Home from './src/components/home/home';
 import Index from './src/components/index/index';
@@ -9,11 +10,11 @@ import Register from './src/components/register/register';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
+import { UserContext } from './UserContext';
+
 
 
 const AppColor = "#FFB7C3";
-
-
 
 const Stack = createStackNavigator();
 
@@ -32,17 +33,23 @@ const Stack = createStackNavigator();
   }
 } */
 
+
+
 export default function App() {
+  const [user, setUser] = useState(null);
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Index" component={Index} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Info" component={Info} />
-        <Stack.Screen name="Home" component={Home} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserContext.Provider value={{ user: user, setUser: setUser }}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Index" component={Index} />
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Info" component={Info} />
+          <Stack.Screen name="Home" component={Home} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserContext.Provider>
   );
 }
 

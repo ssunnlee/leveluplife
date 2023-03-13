@@ -6,7 +6,6 @@ export default class Info extends Component {
     constructor(props) {
         super(props)
         this.state = ({
-            username: 'test',
             age: '',
             name: '',
             weight: 0,
@@ -16,14 +15,14 @@ export default class Info extends Component {
     }
 
     recordData = (name, age, weight, height, gender) => {
-        initCounter(this.state.username);
+        initCounter(this.props.user.uuid);
         initThresholds();
         console.log("User name is " + name);
         console.log("User age is " + age);
         console.log("User height is " + height);
         console.log("User weight is " + weight);
         console.log("User gender is " + gender);
-        updateUserModel(this.state.username, name, age, height, weight, gender);
+        updateUserModel(this.props.user.uuid, name, age, height, weight, gender);
         this.props.navigation.navigate("Home");
     }
 

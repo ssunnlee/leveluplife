@@ -41,11 +41,11 @@ const firebaseConfig = {
   appId: "1:453247823364:web:7779eb606f763a76150f51"
 };
 
-export const initCounter = (username) => {
+export const initCounter = (uuid) => {
   console.log("initCounter called");
   const db = database;
 
-  set(ref(db, "counter/" + username), {
+  set(ref(db, "counter/" + uuid), {
     firstIntake: 0,
     dayCounter: 0,
     currentDay: 0,
@@ -75,11 +75,11 @@ export const initThresholds = () => {
   });
 };
 
-export const updateUserModel = (username, name, age, height, weight, gender) => {
+export const updateUserModel = (uuid, name, age, height, weight, gender) => {
   console.log("updateUserModel called");
   const db = database;
   const bmi = weight / Math.pow(height, 2);
-  set(ref(db, "userParams/" + username), {
+  set(ref(db, "userParams/" + uuid), {
     name: name,
     age: age,
     height: height,
@@ -89,10 +89,10 @@ export const updateUserModel = (username, name, age, height, weight, gender) => 
   });
 };
 
-const userIntakerHelper = async (section, username) => {
+const userIntakerHelper = async (section, uuid) => {
   try {
     var db = database;
-    const snapshot = await get(child(ref(db), `${section}/` + username));
+    const snapshot = await get(child(ref(db), `${section}/` + uuid));
     const data = snapshot.val();
     return data;
   } catch (error) {
@@ -111,11 +111,11 @@ const thresholdsHelper = async (section) => {
   }
 }
 
-const checkThresholds = async (username) => {
-  var counter = await userIntakerHelper("counter", username);
-  const intakes = await userIntakerHelper("intakes", username);
+const checkThresholds = async (uuid) => {
+  var counter = await userIntakerHelper("counter", uuid);
+  const intakes = await userIntakerHelper("intakes", uuid);
   const thresholds = await thresholdsHelper("thresholds");
-  const userParams = await userIntakerHelper("userParams", username);
+  const userParams = await userIntakerHelper("userParams", uuid);
   var recString = "Recommendations:\n";
   counter = counter.dayCounter;
   const bmiString = convertBmiToString(userParams.bmi);
@@ -145,7 +145,7 @@ const checkThresholds = async (username) => {
 };
 
 export const userIntake = async (
-  username,
+  uuid,
   fat,
   protein,
   carbs,
@@ -158,7 +158,7 @@ export const userIntake = async (
   var initIntake = 0;
   var dayCounter = 0;
 
-  const data = await userIntakerHelper("counter", username);
+  const data = await userIntakerHelper("counter", uuid);
   initIntake = data.firstIntake;
   dayCounter = data.dayCounter;
 
@@ -166,28 +166,28 @@ export const userIntake = async (
 
   if (initIntake == 0) {
     // TODO: fix date system, currently rewrites over data every month
-    set(ref(db, "counter/" + username), {
+    set(ref(db, "counter/" + uuid), {
       firstIntake: 0,
       dayCounter: 0,
       currentDay: currentDay,
     });
 
-    set(ref(db, "intakes/" + username), {
+    set(ref(db, "intakes/" + uuid), {
       fat: { [dayCounter]: fat },
       protein: { [dayCounter]: protein },
       carbs: { [dayCounter]: carbs },
       cholesterol: { [dayCounter]: cholesterol },
       calories: { [dayCounter]: calories },
     });
-    set(ref(db, "counter/" + username), {
+    set(ref(db, "counter/" + uuid), {
       dayCounter: 0,
       firstIntake: 1,
       currentDay: currentDay,
     });
   } else {
-    const currentDayData = await userIntakerHelper("counter", username);
+    const currentDayData = await userIntakerHelper("counter", uuid);
     if (currentDayData.currentDay != currentDay) {
-      set(ref(db, "counter/ + username"), {
+      set(ref(db, "counter/" + uuid), {
         dayCounter: currentDayData.dayCounter + 1,
         firstIntake: 1,
         currentDay: currentDay,
@@ -195,7 +195,7 @@ export const userIntake = async (
       dayCounter = currentDayData.dayCounter + 1;
     }
 
-    get(child(ref(db), "intakes/" + username))
+    get(child(ref(db), "intakes/" + uuid))
       .then((snapshot) => {
         if (snapshot.exists()) {
           for (var [key, value] of Object.entries(snapshot.val())) {
@@ -218,7 +218,7 @@ export const userIntake = async (
       });
   }
 
-  const res = await checkThresholds(username);
+  const res = await checkThresholds(uuid);
   return res;
 };
 

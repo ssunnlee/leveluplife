@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { UserContext } from '../../../UserContext';
+
 
 
 export default class Register extends Component {
+    static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = ({
@@ -10,11 +14,26 @@ export default class Register extends Component {
             password: ''
         })
     }
-    createUser = (username, password) => {
-        // TODO: user creation logic
+    createUser = (username, email, password) => {
+        //user creation logic
         console.log("Username is " + username);
         console.log("Password is ", password);
-        this.props.navigation.navigate("Info");
+
+        const auth = getAuth();
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                user.displayName = username;
+                updateProfile(auth.currentUser, {
+                    displayName: username
+                })
+                this.props.navigation.navigate("Info");
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage);
+            });
     }
 
     render() {
@@ -32,6 +51,14 @@ export default class Register extends Component {
                             autoCorrect={false}
                         />
                         <TextInput
+                            placeholder="Email"
+                            returnKeyType="next"
+                            onChangeText={(email) => this.setState({ email })}
+                            style={styles.input}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+                        <TextInput
                             placeholder="Password"
                             returnKeyType="go"
                             onChangeText={(password) => this.setState({ password })}
@@ -41,9 +68,9 @@ export default class Register extends Component {
                     </View>
                     <View style={{ borderRadius: 20, width: 120, height: 50, alignSelf: 'center', marginBottom: 20, backgroundColor: 'white', borderWidth: 2, justifyContent: 'center', textAlign: 'center', margin: 10 }}>
                         <Button
-                            title="Login"
+                            title="Register"
                             color="#3C6435"
-                            onPress={() => this.createUser(this.state.username, this.state.password)}
+                            onPress={() => this.createUser(this.state.username, this.state.email, this.state.password)}
                         />
                     </View>
                 </View>

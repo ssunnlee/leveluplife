@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import { UserContext } from '../../../UserContext';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 
 export default class Login extends Component {
+    static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = ({
@@ -10,16 +13,26 @@ export default class Login extends Component {
             password: ''
         })
     }
-    attemptLogin = (username, password) => {
-        console.log("Username is " + username);
+    attemptLogin = (email, password) => {
+        console.log("Email is " + email);
         // TODO: authentification logic
-        if (password == "test") {
-            this.props.navigation.navigate("Home");
-        } else {
-            Alert.alert('Login', 'Login information is incorrect', [
-                { text: 'OK' },
-            ]);
-        }
+
+        const auth = getAuth();
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const currUser = userCredential.user;
+                this.context.setUser(currUser);
+                console.log(this.context.user.uid);
+                this.props.navigation.navigate("Home");
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage);
+                Alert.alert('Login', 'Login information is incorrect', [
+                    { text: 'OK' },
+                ]);
+            });
     }
 
     render() {
@@ -29,9 +42,9 @@ export default class Login extends Component {
                     <Text style={styles.title}>Welcome to LevelUpLife</Text>
                     <View style={styles.InfoFormContainer}>
                         <TextInput
-                            placeholder="Username"
+                            placeholder="Email"
                             returnKeyType="next"
-                            onChangeText={(username) => this.setState({ username })}
+                            onChangeText={(email) => this.setState({ email })}
                             style={styles.input}
                             autoCapitalize="none"
                             autoCorrect={false}
@@ -48,7 +61,7 @@ export default class Login extends Component {
                         <Button
                             title="Login"
                             color="#3C6435"
-                            onPress={() => this.attemptLogin(this.state.username, this.state.password)}
+                            onPress={() => this.attemptLogin(this.state.email, this.state.password)}
                         />
                     </View>
                 </View>
