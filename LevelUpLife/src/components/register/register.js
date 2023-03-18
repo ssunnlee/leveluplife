@@ -23,10 +23,12 @@ export default class Register extends Component {
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-                user.displayName = username;
                 updateProfile(auth.currentUser, {
                     displayName: username
                 })
+
+                this.contextType.setUser(user);
+
                 this.props.navigation.navigate("Info");
             })
             .catch((error) => {

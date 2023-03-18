@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput } from 'react-native';
 import { initCounter, initThresholds, updateUserModel } from '../firebase/firebaseConfig'
+import { UserContext } from '../../../UserContext';
 
 export default class Info extends Component {
+    static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = ({
@@ -15,14 +17,15 @@ export default class Info extends Component {
     }
 
     recordData = (name, age, weight, height, gender) => {
-        initCounter(this.props.user.uuid);
+        const user = contextType.user;
+        initCounter(user.uuid);
         initThresholds();
         console.log("User name is " + name);
         console.log("User age is " + age);
         console.log("User height is " + height);
         console.log("User weight is " + weight);
         console.log("User gender is " + gender);
-        updateUserModel(this.props.user.uuid, name, age, height, weight, gender);
+        updateUserModel(user.uuid, name, age, height, weight, gender);
         this.props.navigation.navigate("Home");
     }
 

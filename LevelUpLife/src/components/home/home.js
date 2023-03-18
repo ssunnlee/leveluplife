@@ -1,12 +1,10 @@
-import React, { Component, useContext } from 'react';
+import React, { Component } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
 import { userIntake } from '../firebase/firebaseConfig';
-import { UserContext } from '../../../App';
-//import AgeForm from './ageForm';
-//import {db} from '../../config/global.js'
-
+import { UserContext } from '../../../UserContext';
 
 export default class Home extends Component {
+    static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = ({
@@ -19,7 +17,7 @@ export default class Home extends Component {
     }
 
     recordData = async (fat, protein, carbs, ch, cal) => {
-        const { user, _ } = useContext(UserContext);
+        const user = UserContext.user;
         const st = await userIntake(user.uuid, fat, protein, carbs, parseInt(ch), cal);
         console.log(st);
         Alert.alert("Notification", st);
