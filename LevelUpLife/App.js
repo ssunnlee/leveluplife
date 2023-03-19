@@ -54,11 +54,11 @@ export default function App() {
     <UserContext.Provider value={{ user: user, setUser: setUser }}>
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen name="Home" component={HomeStack} />
           <Stack.Screen name="Index" component={Index} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="Info" component={Info} />
+          <Stack.Screen name="Home" component={HomeStack} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserContext.Provider>
