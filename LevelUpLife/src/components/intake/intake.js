@@ -1,90 +1,91 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput } from 'react-native';
-import { initCounter, initThresholds, updateUserModel } from '../firebase/firebaseConfig'
+import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
+import { userIntake } from '../firebase/firebaseConfig';
 import { UserContext } from '../../../UserContext';
 
-export default class Info extends Component {
+export default class Intake extends Component {
     static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = ({
-            age: '',
-            name: '',
-            weight: 0,
-            height: 0,
-            gender: ''
+            fat: 0,
+            protein: 0,
+            fiber: 0,
+            ch: 0,
+            cal: 0
         })
     }
 
-    recordData = (name, age, weight, height, gender) => {
-        const user = contextType.user;
-        initCounter(user.uuid);
-        initThresholds();
-        console.log("User name is " + name);
-        console.log("User age is " + age);
-        console.log("User height is " + height);
-        console.log("User weight is " + weight);
-        console.log("User gender is " + gender);
-        updateUserModel(user.uuid, name, age, height, weight, gender);
-        this.props.navigation.navigate("HomeStack");
+    recordData = async (fat, protein, fiber, ch, cal) => {
+        //const user = UserContext.user;
+        //const st = await userIntake(user.uuid, fat, protein, fiber, parseInt(ch), cal);
+        //console.log(st);
+        console.log("User fat is " + fat);
+        console.log("User protein is " + protein);
+        console.log("User fiber is " + fiber);
+        console.log("User cholesterol is " + ch);
+        console.log("User calories is " + cal);
+        //Alert.alert("Notification", st);
+        //this.props.navigation.goBack();
     }
 
     render() {
         return (
             <KeyboardAvoidingView behavior="padding" style={styles.container}>
                 <View style={styles.formContainer}>
-                    <Text style={styles.title}>Welcome to LevelUpLife</Text>
-                    <View style={styles.InfoFormContainer}>
+                    <Text style={styles.title}>Recording Intake</Text>
+                    <View style={styles.ageFormContainer}>
                         <TextInput
-                            placeholder="Name"
+                            placeholder="Fat"
                             returnKeyType="next"
-                            onChangeText={(name) => this.setState({ name })}
+                            onChangeText={(fat) => this.setState({ fat })}
                             style={styles.input}
                             autoCapitalize="words"
                             autoCorrect={false}
+                            keyboardType='numeric'
                         />
                         <TextInput
-                            placeholder="Age"
-                            returnKeyType="go"
-                            onChangeText={(age) => this.setState({ age })}
-                            style={styles.input}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType="numeric"
-                        />
-                        <TextInput
-                            placeholder="Weight (in kilograms)"
+                            placeholder="Protein"
                             returnKeyType="next"
-                            onChangeText={(weight) => this.setState({ weight })}
+                            onChangeText={(protein) => this.setState({ protein })}
                             style={styles.input}
-                            autoCapitalize="none"
+                            autoCapitalize="words"
                             autoCorrect={false}
-                            keyboardType="numeric"
+                            keyboardType='numeric'
                         />
                         <TextInput
-                            placeholder="Height (in meters)"
+                            placeholder="Fiber"
                             returnKeyType="next"
-                            onChangeText={(height) => this.setState({ height })}
+                            onChangeText={(fiber) => this.setState({ fiber })}
                             style={styles.input}
-                            autoCapitalize="none"
+                            autoCapitalize="words"
                             autoCorrect={false}
-                            keyboardType="numeric"
+                            keyboardType='numeric'
                         />
                         <TextInput
-                            placeholder="Gender (Male or Female)"
-                            returnKeyType="go"
-                            onChangeText={(gender) => this.setState({ gender })}
+                            placeholder="Cholesterol (in mg)"
+                            returnKeyType="next"
+                            onChangeText={(ch) => this.setState({ ch })}
                             style={styles.input}
-                            autoCapitalize="none"
+                            autoCapitalize="words"
                             autoCorrect={false}
-                            keyboardType="words"
+                            keyboardType='numeric'
+                        />
+                        <TextInput
+                            placeholder="Calories"
+                            returnKeyType="go"
+                            onChangeText={(cal) => this.setState({ cal })}
+                            style={styles.input}
+                            autoCapitalize="words"
+                            autoCorrect={false}
+                            keyboardType='numeric'
                         />
                     </View>
                     <View style={{ borderRadius: 20, width: 120, height: 50, alignSelf: 'center', marginBottom: 20, backgroundColor: 'white', borderWidth: 2, justifyContent: 'center', textAlign: 'center', margin: 10 }}>
                         <Button
                             title="Enter"
                             color="#3C6435"
-                            onPress={() => this.recordData(this.state.name, this.state.age, this.state.weight, this.state.height, this.state.gender)}
+                            onPress={() => this.recordData(this.state.fat, this.state.protein, this.state.fiber, this.state.ch, this.state.cal)}
                         />
                     </View>
                 </View>
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
         fontSize: 30,
     },
 
-    InfoFormContainer: {
+    ageFormContainer: {
         marginTop: 50,
         padding: 20,
     },

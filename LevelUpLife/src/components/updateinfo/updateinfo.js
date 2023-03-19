@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput } from 'react-native';
+import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
 import { initCounter, initThresholds, updateUserModel } from '../firebase/firebaseConfig'
 import { UserContext } from '../../../UserContext';
 
-export default class Info extends Component {
-    static contextType = UserContext;
+export default class UpdateInfo extends Component {
+    //static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = ({
@@ -17,16 +17,19 @@ export default class Info extends Component {
     }
 
     recordData = (name, age, weight, height, gender) => {
-        const user = contextType.user;
-        initCounter(user.uuid);
-        initThresholds();
-        console.log("User name is " + name);
-        console.log("User age is " + age);
-        console.log("User height is " + height);
-        console.log("User weight is " + weight);
-        console.log("User gender is " + gender);
-        updateUserModel(user.uuid, name, age, height, weight, gender);
-        this.props.navigation.navigate("HomeStack");
+        //const user = contextType.user;
+        //initCounter(user.uuid);
+        //initThresholds();
+        console.log("Updated User name is " + name);
+        console.log("Updated User age is " + age);
+        console.log("Updated User height is " + height);
+        console.log("Updated User weight is " + weight);
+        console.log("Updated User gender is " + gender);
+        //TextInput.clear()
+        Alert.alert("Notification", "Your info was updated.");
+
+        //updateUserModel(user.uuid, name, age, height, weight, gender);
+        //this.props.navigation.navigate("HomeStack");
     }
 
     render() {

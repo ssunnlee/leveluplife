@@ -38,6 +38,10 @@ export default class Register extends Component {
             });
     }
 
+    temp = (username, email, password) => {
+        console.log("Bleh")
+    }
+
     render() {
         return (
             <KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -72,7 +76,7 @@ export default class Register extends Component {
                         <Button
                             title="Register"
                             color="#3C6435"
-                            onPress={() => this.createUser(this.state.username, this.state.email, this.state.password)}
+                            onPress={() => this.temp(this.state.username, this.state.email, this.state.password)}
                         />
                     </View>
                 </View>
