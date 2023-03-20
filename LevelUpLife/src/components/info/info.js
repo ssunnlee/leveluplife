@@ -17,16 +17,16 @@ export default class Info extends Component {
     }
 
     recordData = (name, age, weight, height, gender) => {
-        const user = contextType.user;
-        initCounter(user.uuid);
+        const user = this.context.user;
+        initCounter(user.uid);
         initThresholds();
         console.log("User name is " + name);
         console.log("User age is " + age);
         console.log("User height is " + height);
         console.log("User weight is " + weight);
         console.log("User gender is " + gender);
-        updateUserModel(user.uuid, name, age, height, weight, gender);
-        this.props.navigation.navigate("HomeStack");
+        updateUserModel(user.uid, name, age, height, weight, gender);
+        this.props.navigation.navigate("Home");
     }
 
     render() {

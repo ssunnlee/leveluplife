@@ -20,12 +20,37 @@ export default class Register extends Component {
         console.log("Password is ", password);
 
         const auth = getAuth();
-        createUserWithEmailAndPassword(auth, email, password)
+        const promise = createUserWithEmailAndPassword(auth, email, password);
+        promise.then((userCredential) => {
+            const user = userCredential.user;
+            console.log(user == null);
+            updateProfile(auth.currentUser, {
+                displayName: username
+            }).then(() => {
+                console.log("success in username change")
+                console.log(user.displayName);
+                console.log(auth.currentUser.displayName);
+                this.context.setUser(user);
+                this.props.navigation.navigate("Info");
+            }).catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage);
+            });
+        });
+        promise.catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode, errorMessage);
+        })
+        /* createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-                updateProfile(auth.currentUser, {
+                updateProfile(user, {
                     displayName: username
-                })
+                }).then(console.log("success in username change")).catch(console.log("oh no"))
+
+                console.log(user.displayName);
 
                 this.contextType.setUser(user);
 
@@ -35,11 +60,10 @@ export default class Register extends Component {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorCode, errorMessage);
-            });
-    }
-
-    temp = (username, email, password) => {
-        console.log("Bleh")
+                Alert.alert('Register', errorMessage, [
+                    { text: 'OK' },
+                ]);
+            }); */
     }
 
     render() {
@@ -76,7 +100,7 @@ export default class Register extends Component {
                         <Button
                             title="Register"
                             color="#3C6435"
-                            onPress={() => this.temp(this.state.username, this.state.email, this.state.password)}
+                            onPress={() => this.createUser(this.state.username, this.state.email, this.state.password)}
                         />
                     </View>
                 </View>

@@ -4,7 +4,7 @@ import { initCounter, initThresholds, updateUserModel } from '../firebase/fireba
 import { UserContext } from '../../../UserContext';
 
 export default class UpdateInfo extends Component {
-    //static contextType = UserContext;
+    static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = ({
@@ -17,9 +17,9 @@ export default class UpdateInfo extends Component {
     }
 
     recordData = (name, age, weight, height, gender) => {
-        //const user = contextType.user;
-        //initCounter(user.uuid);
-        //initThresholds();
+        const user = this.context.user;
+        initCounter(user.uid);
+        initThresholds();
         console.log("Updated User name is " + name);
         console.log("Updated User age is " + age);
         console.log("Updated User height is " + height);
@@ -28,8 +28,8 @@ export default class UpdateInfo extends Component {
         //TextInput.clear()
         Alert.alert("Notification", "Your info was updated.");
 
-        //updateUserModel(user.uuid, name, age, height, weight, gender);
-        //this.props.navigation.navigate("HomeStack");
+        updateUserModel(user.uid, name, age, height, weight, gender);
+        this.props.navigation.navigate("Home");
     }
 
     render() {

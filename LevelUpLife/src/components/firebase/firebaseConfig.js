@@ -12,6 +12,7 @@ import {
   update,
   push,
 } from "firebase/database";
+import { getEdamamData } from "./recipeAPI";
 // import {...} from "firebase/firestore";
 // import {...} from "firebase/functions";
 // import {...} from "firebase/storage";
@@ -32,20 +33,20 @@ const firebaseConfig = {
 
 // Conner's firebase config
 const firebaseConfig = {
-  databaseURL: "https://leveluplife-81ced-default-rtdb.firebaseio.com/",
   apiKey: "AIzaSyDgc_JdtnDkO5-8UbRZwQV_cVUtDY7AOok",
   authDomain: "leveluplife-81ced.firebaseapp.com",
+  databaseURL: "https://leveluplife-81ced-default-rtdb.firebaseio.com",
   projectId: "leveluplife-81ced",
   storageBucket: "leveluplife-81ced.appspot.com",
   messagingSenderId: "453247823364",
   appId: "1:453247823364:web:7779eb606f763a76150f51"
 };
 
-export const initCounter = (uuid) => {
+export const initCounter = (uid) => {
   console.log("initCounter called");
   const db = database;
 
-  set(ref(db, "counter/" + uuid), {
+  set(ref(db, "counter/" + uid), {
     firstIntake: 0,
     dayCounter: 0,
     currentDay: 0,
@@ -68,31 +69,85 @@ export const initThresholds = () => {
   console.log("initThresholds called");
   const db = database;
   set(ref(db, "thresholds/"), {
-    underweight: { cholesterol: 300 },
-    healthy: { cholesterol: 300 },
-    overweight: { cholesterol: 300 },
-    obese: { cholesterol: 300 },
+    male: {
+      "14-18": {
+        calories: 2100,
+        cholesterol: 300,
+        fiber: 22.5,
+        fat: 44,
+        protein: 52,
+      },
+      "19-30": {
+        calories: 2200,
+        cholesterol: 300,
+        fiber: 32.5,
+        fat: 44,
+        protein: 56,
+      },
+      "31-50": {
+        calories: 2000,
+        cholesterol: 300,
+        fiber: 32.5,
+        fat: 44,
+        protein: 56,
+      },
+      "51+": {
+        calories: 1800,
+        cholesterol: 300,
+        fiber: 28.0,
+        fat: 44,
+        protein: 56,
+      },
+    },
+    female: {
+      "14-18": {
+        calories: 1500,
+        cholesterol: 300,
+        fiber: 22.5,
+        fat: 33,
+        protein: 46,
+      },
+      "19-30": {
+        calories: 1600,
+        cholesterol: 300,
+        fiber: 26.5,
+        fat: 33,
+        protein: 46,
+      },
+      "31-50": {
+        calories: 1500,
+        cholesterol: 300,
+        fiber: 26.5,
+        fat: 33,
+        protein: 46,
+      },
+      "51+": {
+        calories: 1300,
+        cholesterol: 300,
+        fiber: 22.0,
+        fat: 33,
+        protein: 46,
+      },
+    },
   });
 };
 
-export const updateUserModel = (uuid, name, age, height, weight, gender) => {
-  console.log("updateUserModel called");
+export const updateUserModel = (uid, name, age, height, weight, gender) => {
+  console.log("updateUserModel called " + uid);
   const db = database;
-  const bmi = weight / Math.pow(height, 2);
-  set(ref(db, "userParams/" + uuid), {
+  set(ref(db, "userParams/" + uid), {
     name: name,
     age: age,
     height: height,
     weight: weight,
-    bmi: bmi,
     gender: gender,
   });
 };
 
-const userIntakerHelper = async (section, uuid) => {
+const userIntakerHelper = async (section, uid) => {
   try {
     var db = database;
-    const snapshot = await get(child(ref(db), `${section}/` + uuid));
+    const snapshot = await get(child(ref(db), `${section}/` + uid));
     const data = snapshot.val();
     return data;
   } catch (error) {
@@ -100,7 +155,7 @@ const userIntakerHelper = async (section, uuid) => {
   }
 };
 
-const thresholdsHelper = async (section) => {
+const thresholdsHelper = async (section, uid) => {
   try {
     var db = database;
     const snapshot = await get(child(ref(db), `${section}/`));
@@ -109,46 +164,266 @@ const thresholdsHelper = async (section) => {
   } catch (error) {
     console.error(error);
   }
-}
+};
 
-const checkThresholds = async (uuid) => {
-  var counter = await userIntakerHelper("counter", uuid);
-  const intakes = await userIntakerHelper("intakes", uuid);
+const ageToRange = (age) => {
+  var astring = "";
+  if (age > 51) {
+    astring = "51+";
+  } else if (age > 31) {
+    astring = "31-50";
+  } else if (age > 19) {
+    astring = "19-30";
+  } else if (age > 14) {
+    astring = "14-18";
+  }
+  return astring;
+};
+
+export const getSummary = async (uid) => {
+  var counter = await userIntakerHelper("counter", uid);
+  var currentDay = counter.dayCounter;
+  const firstDayIndex = currentDay - 7;
+  const intakes = await userIntakerHelper("intakes", uid);
+  const thresholds = await thresholdsHelper("thresholds", uid);
+  const userParams = await userIntakerHelper("userParams", uid);
+  const ageRangeString = ageToRange(userParams.age);
+  const genderString = userParams.gender;
+
+  var avgCalories = 0;
+  var avgCholesterol = 0;
+  var avgFat = 0;
+  var avgProtein = 0;
+  var avgFiber = 0;
+
+  var resultString = "Seven Day Summary: \n\n";
+
+  //diet=low-carb&diet=low-fat
+  var dietParamString = "";
+  var maxCalorieMeal = "";
+
+  for (var [intakeType, intakeAmt] of Object.entries(intakes)) {
+    if (intakeType == "calories") {
+      for (let i = firstDayIndex; i < currentDay; i++) {
+        avgCalories += intakeAmt[i];
+      }
+
+      avgCalories = Math.floor(avgCalories / 7);
+
+      var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
+
+      var percentage = Math.floor((avgCalories / thresholdAmt) * 100);
+      maxCalorieMeal = `0-${Math.floor(thresholdAmt) / 3}`;
+
+      resultString += `Calories: ${percentage}% (${avgCalories} cal/${thresholdAmt} cal) of daily recommended limit\n`;
+    }
+
+    if (intakeType == "cholesterol") {
+      for (let i = firstDayIndex; i < currentDay; i++) {
+        avgCholesterol += intakeAmt[i];
+      }
+
+      avgCholesterol = Math.floor(avgCholesterol / 7);
+
+      var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
+      var percentage = Math.floor((avgCholesterol / thresholdAmt) * 100);
+
+      resultString += `Cholesterol: ${percentage}% (${avgCholesterol} mg/${thresholdAmt} mg) of daily recommended limit\n`;
+    }
+
+    if (intakeType == "fat") {
+      for (let i = firstDayIndex; i < currentDay; i++) {
+        avgFat += intakeAmt[i];
+      }
+      avgFat = Math.floor(avgFat / 7);
+
+      var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
+      var percentage = Math.floor((avgFat / thresholdAmt) * 100);
+
+      if (percentage > 100) {
+        dietParamString += "diet=low-fat&";
+      }
+
+      resultString += `Fat: ${percentage}% (${avgFat} g/${thresholdAmt} g) of daily recommended limit\n`;
+    }
+
+    if (intakeType == "protein") {
+      for (let i = firstDayIndex; i < currentDay; i++) {
+        avgProtein += intakeAmt[i];
+      }
+
+      avgProtein = Math.floor(avgProtein / 7);
+
+      var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
+      var percentage = Math.floor((avgProtein / thresholdAmt) * 100);
+      if (percentage < 100) {
+        dietParamString += "diet=high-protein&";
+      }
+
+      resultString += `Protein: ${percentage}% (${avgProtein} g/${thresholdAmt} g) of daily recommended intake\n`;
+    }
+
+    if (intakeType == "fiber") {
+      for (let i = firstDayIndex; i < currentDay; i++) {
+        avgFiber += intakeAmt[i];
+      }
+      avgFiber = Math.floor(avgFiber / 7);
+
+      var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
+      var percentage = Math.floor((avgFiber / thresholdAmt) * 100);
+      if (percentage < 100) {
+        dietParamString += "diet=high-fiber&";
+      }
+
+      resultString += `Fiber: ${percentage}% (${avgFiber} g/${thresholdAmt} g) of daily recommended intake\n`;
+    }
+  }
+
+  //console.log(resultString);
+  var dataDictionary = {};
+  const threeRecipesData = getEdamamData(dietParamString, maxCalorieMeal);
+  dataDictionary["threeRecipesData"] = threeRecipesData;
+  dataDictionary["summaryString"] = resultString;
+
+  return dataDictionary;
+};
+
+const checkThresholds = async (uid) => {
+  var counter = await userIntakerHelper("counter", uid);
+  const intakes = await userIntakerHelper("intakes", uid);
   const thresholds = await thresholdsHelper("thresholds");
-  const userParams = await userIntakerHelper("userParams", uuid);
+  const userParams = await userIntakerHelper("userParams", uid);
   var recString = "Recommendations:\n";
   counter = counter.dayCounter;
-  const bmiString = convertBmiToString(userParams.bmi);
+  const ageRangeString = ageToRange(userParams.age);
+  const genderString = userParams.gender;
   for (var [intakeType, intakeAmt] of Object.entries(intakes)) {
+    if (intakeType == "calories") {
+      if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType]
+      ) {
+        recString = recString.concat(
+          `You have exceeded the recommended daily limit of calories(${thresholds[genderString][ageRangeString][intakeType]} cal)\n`
+        );
+      } else if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType] * 0.8
+      ) {
+        recString = recString.concat(
+          `You have exceeded 80% of the recommended daily limit of calories(${thresholds[genderString][ageRangeString][intakeType] * 0.8
+          } cal)\n`
+        );
+      }
+    }
+
     if (intakeType == "cholesterol") {
-      if (intakeAmt[counter] > thresholds[bmiString][intakeType]) {
+      if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType]
+      ) {
         recString = recString.concat(
-          "You have exceeded the recommended daily amount of cholesterol(300mg)\n"
+          `You have exceeded the recommended daily limit of cholesterol(${thresholds[genderString][ageRangeString][intakeType]} mg)\n`
         );
-      } else if (intakeAmt[counter] > thresholds[bmiString][intakeType] * 0.8) {
+      } else if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType] * 0.8
+      ) {
         recString = recString.concat(
-          `You have exceeded 80% of the recommended daily amount of cholesterol(${thresholds[bmiString][intakeType] * 0.8
-          }mg)\n`
+          `You have exceeded 80% of the recommended daily limit of cholesterol(${thresholds[genderString][ageRangeString][intakeType] * 0.8
+          } mg)\n`
         );
+      }
+    }
+
+    if (intakeType == "fat") {
+      if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType]
+      ) {
+        recString = recString.concat(
+          `You have exceeded the recommended daily limit of fat(${thresholds[genderString][ageRangeString][intakeType]} grams)\n`
+        );
+      } else if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType] * 0.8
+      ) {
+        recString = recString.concat(
+          `You have exceeded 80% of the recommended daily limit of fat(${thresholds[genderString][ageRangeString][intakeType] * 0.8
+          } grams)\n`
+        );
+      }
+    }
+
+    if (intakeType == "protein") {
+      if (
+        intakeAmt[counter] <
+        thresholds[genderString][ageRangeString][intakeType]
+      ) {
+        recString = recString.concat(
+          `You have not met the recommended daily intake of protein(${thresholds[genderString][ageRangeString][intakeType]} grams)\n`
+        );
+      } else if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType]
+      ) {
+        recString = recString.concat(
+          `You have met the recommended daily intake of proteins(${thresholds[genderString][ageRangeString][intakeType]} grams)\n`
+        );
+      } else if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType] * 0.8
+      ) {
+        recString = recString.concat(
+          `You have consumed 80% of the recommended daily intake of proteins(${thresholds[genderString][ageRangeString][intakeType] * 0.8
+          } grams)\n`
+        );
+      }
+    }
+
+    if (intakeType == "fiber") {
+      if (
+        intakeAmt[counter] <
+        thresholds[genderString][ageRangeString][intakeType]
+      ) {
+        recString = recString.concat(
+          `You have not met the recommended daily intake of fiber(${thresholds[genderString][ageRangeString][intakeType]} grams)\n`
+        );
+      } else if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType]
+      ) {
+        recString = recString.concat(
+          `You have met the recommended daily intake of fiber(${thresholds[genderString][ageRangeString][intakeType]} grams)\n`
+        );
+      } else if (
+        intakeAmt[counter] >
+        thresholds[genderString][ageRangeString][intakeType] * 0.8
+      ) {
+        recString = recString.concat(
+          `You have consumed 80% of the recommended daily intake of fiber(${thresholds[genderString][ageRangeString][intakeType] * 0.8
+          } grams)\n`
+        );
+
       }
     }
   }
 
 
   if (recString != "Recommendations:\n") {
-    console.log(recString)
+    console.log(recString);
     return recString;
   } else {
-    console.log("You adhered to all recommended daily amount of nutrients. Great work!\n")
+    console.log("You adhered to all recommended daily amount of nutrients. Great work!\n");
     return "You adhered to all recommended daily amount of nutrients. Great work!\n";
   }
 };
 
 export const userIntake = async (
-  uuid,
+  uid,
   fat,
   protein,
-  carbs,
+  fiber,
   cholesterol,
   calories
 ) => {
@@ -158,7 +433,7 @@ export const userIntake = async (
   var initIntake = 0;
   var dayCounter = 0;
 
-  const data = await userIntakerHelper("counter", uuid);
+  const data = await userIntakerHelper("counter", uid);
   initIntake = data.firstIntake;
   dayCounter = data.dayCounter;
 
@@ -166,28 +441,28 @@ export const userIntake = async (
 
   if (initIntake == 0) {
     // TODO: fix date system, currently rewrites over data every month
-    set(ref(db, "counter/" + uuid), {
+    set(ref(db, "counter/" + uid), {
       firstIntake: 0,
       dayCounter: 0,
       currentDay: currentDay,
     });
 
-    set(ref(db, "intakes/" + uuid), {
+    set(ref(db, "intakes/" + uid), {
       fat: { [dayCounter]: fat },
       protein: { [dayCounter]: protein },
-      carbs: { [dayCounter]: carbs },
+      fiber: { [dayCounter]: fiber },
       cholesterol: { [dayCounter]: cholesterol },
       calories: { [dayCounter]: calories },
     });
-    set(ref(db, "counter/" + uuid), {
+    set(ref(db, "counter/" + uid), {
       dayCounter: 0,
       firstIntake: 1,
       currentDay: currentDay,
     });
   } else {
-    const currentDayData = await userIntakerHelper("counter", uuid);
+    const currentDayData = await userIntakerHelper("counter", uid);
     if (currentDayData.currentDay != currentDay) {
-      set(ref(db, "counter/" + uuid), {
+      set(ref(db, "counter/" + uid), {
         dayCounter: currentDayData.dayCounter + 1,
         firstIntake: 1,
         currentDay: currentDay,
@@ -195,7 +470,7 @@ export const userIntake = async (
       dayCounter = currentDayData.dayCounter + 1;
     }
 
-    get(child(ref(db), "intakes/" + uuid))
+    get(child(ref(db), "intakes/" + uid))
       .then((snapshot) => {
         if (snapshot.exists()) {
           for (var [key, value] of Object.entries(snapshot.val())) {
@@ -218,7 +493,7 @@ export const userIntake = async (
       });
   }
 
-  const res = await checkThresholds(uuid);
+  const res = await checkThresholds(uid);
   return res;
 };
 

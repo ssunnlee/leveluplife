@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { userIntake } from '../firebase/firebaseConfig';
 import { UserContext } from '../../../UserContext';
 
@@ -18,7 +18,7 @@ export default class Intake extends Component {
 
     recordData = async (fat, protein, fiber, ch, cal) => {
         //const user = UserContext.user;
-        //const st = await userIntake(user.uuid, fat, protein, fiber, parseInt(ch), cal);
+        //const st = await userIntake(user.uid, fat, protein, fiber, parseInt(ch), cal);
         //console.log(st);
         console.log("User fat is " + fat);
         console.log("User protein is " + protein);
@@ -31,65 +31,67 @@ export default class Intake extends Component {
 
     render() {
         return (
-            <KeyboardAvoidingView behavior="padding" style={styles.container}>
-                <View style={styles.formContainer}>
-                    <Text style={styles.title}>Recording Intake</Text>
-                    <View style={styles.ageFormContainer}>
-                        <TextInput
-                            placeholder="Fat"
-                            returnKeyType="next"
-                            onChangeText={(fat) => this.setState({ fat })}
-                            style={styles.input}
-                            autoCapitalize="words"
-                            autoCorrect={false}
-                            keyboardType='numeric'
-                        />
-                        <TextInput
-                            placeholder="Protein"
-                            returnKeyType="next"
-                            onChangeText={(protein) => this.setState({ protein })}
-                            style={styles.input}
-                            autoCapitalize="words"
-                            autoCorrect={false}
-                            keyboardType='numeric'
-                        />
-                        <TextInput
-                            placeholder="Fiber"
-                            returnKeyType="next"
-                            onChangeText={(fiber) => this.setState({ fiber })}
-                            style={styles.input}
-                            autoCapitalize="words"
-                            autoCorrect={false}
-                            keyboardType='numeric'
-                        />
-                        <TextInput
-                            placeholder="Cholesterol (in mg)"
-                            returnKeyType="next"
-                            onChangeText={(ch) => this.setState({ ch })}
-                            style={styles.input}
-                            autoCapitalize="words"
-                            autoCorrect={false}
-                            keyboardType='numeric'
-                        />
-                        <TextInput
-                            placeholder="Calories"
-                            returnKeyType="go"
-                            onChangeText={(cal) => this.setState({ cal })}
-                            style={styles.input}
-                            autoCapitalize="words"
-                            autoCorrect={false}
-                            keyboardType='numeric'
-                        />
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <KeyboardAvoidingView behavior="padding" style={styles.container}>
+                    <View style={styles.formContainer}>
+                        <Text style={styles.title}>Recording Intake</Text>
+                        <View style={styles.ageFormContainer}>
+                            <TextInput
+                                placeholder="Fat"
+                                returnKeyType="next"
+                                onChangeText={(fat) => this.setState({ fat })}
+                                style={styles.input}
+                                autoCapitalize="words"
+                                autoCorrect={false}
+                                keyboardType='numeric'
+                            />
+                            <TextInput
+                                placeholder="Protein"
+                                returnKeyType="next"
+                                onChangeText={(protein) => this.setState({ protein })}
+                                style={styles.input}
+                                autoCapitalize="words"
+                                autoCorrect={false}
+                                keyboardType='numeric'
+                            />
+                            <TextInput
+                                placeholder="Fiber"
+                                returnKeyType="next"
+                                onChangeText={(fiber) => this.setState({ fiber })}
+                                style={styles.input}
+                                autoCapitalize="words"
+                                autoCorrect={false}
+                                keyboardType='numeric'
+                            />
+                            <TextInput
+                                placeholder="Cholesterol (in mg)"
+                                returnKeyType="next"
+                                onChangeText={(ch) => this.setState({ ch })}
+                                style={styles.input}
+                                autoCapitalize="words"
+                                autoCorrect={false}
+                                keyboardType='numeric'
+                            />
+                            <TextInput
+                                placeholder="Calories"
+                                returnKeyType="go"
+                                onChangeText={(cal) => this.setState({ cal })}
+                                style={styles.input}
+                                autoCapitalize="words"
+                                autoCorrect={false}
+                                keyboardType='numeric'
+                            />
+                        </View>
+                        <View style={{ borderRadius: 20, width: 120, height: 50, alignSelf: 'center', marginBottom: 20, backgroundColor: 'white', borderWidth: 2, justifyContent: 'center', textAlign: 'center', margin: 10 }}>
+                            <Button
+                                title="Enter"
+                                color="#3C6435"
+                                onPress={() => this.recordData(this.state.fat, this.state.protein, this.state.fiber, this.state.ch, this.state.cal)}
+                            />
+                        </View>
                     </View>
-                    <View style={{ borderRadius: 20, width: 120, height: 50, alignSelf: 'center', marginBottom: 20, backgroundColor: 'white', borderWidth: 2, justifyContent: 'center', textAlign: 'center', margin: 10 }}>
-                        <Button
-                            title="Enter"
-                            color="#3C6435"
-                            onPress={() => this.recordData(this.state.fat, this.state.protein, this.state.fiber, this.state.ch, this.state.cal)}
-                        />
-                    </View>
-                </View>
-            </KeyboardAvoidingView>
+                </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
         );
     }
 }

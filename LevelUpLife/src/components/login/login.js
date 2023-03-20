@@ -23,7 +23,7 @@ export default class Login extends Component {
                 const currUser = userCredential.user;
                 this.context.setUser(currUser);
                 console.log(this.context.user.uid);
-                this.props.navigation.navigate("HomeStack");
+                this.props.navigation.navigate("Home");
             })
             .catch((error) => {
                 const errorCode = error.code;

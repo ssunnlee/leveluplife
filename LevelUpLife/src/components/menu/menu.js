@@ -4,19 +4,19 @@ import { initCounter, initThresholds, updateUserModel } from '../firebase/fireba
 import { UserContext } from '../../../UserContext';
 
 export default class Menu extends Component {
-    //static contextType = UserContext;
+    static contextType = UserContext;
     constructor(props) {
         super(props)
     }
 
     recordData = () => {
-        //const user = contextType.user;
-        //initCounter(user.uuid);
+        const user = this.context.user;
+        //initCounter(user.uid);
         //initThresholds();
         Alert.alert("Notification", "Menu");
 
-        //updateUserModel(user.uuid, name, age, height, weight, gender);
-        //this.props.navigation.navigate("HomeStack");
+        //updateUserModel(user.uid, name, age, height, weight, gender);
+        //this.props.navigation.navigate("Home");
     }
 
     render() {
@@ -28,7 +28,7 @@ export default class Menu extends Component {
                         <Text style={styles.info}>Something</Text>
                         <Text style={styles.info}>More things</Text>
                         <Text style={styles.info}>blah blah blah</Text>
-                        <Image style={styles.sampleImage} source={{uri:'https://www.kitchensanctuary.com/wp-content/uploads/2021/09/How-to-cook-the-perfect-steak-tall-FS.webp'}}></Image>
+                        <Image style={styles.sampleImage} source={{ uri: 'https://www.kitchensanctuary.com/wp-content/uploads/2021/09/How-to-cook-the-perfect-steak-tall-FS.webp' }}></Image>
                     </View>
                     <View style={{ borderRadius: 20, width: 120, height: 50, alignSelf: 'center', marginBottom: 20, backgroundColor: 'white', borderWidth: 2, justifyContent: 'center', textAlign: 'center', margin: 10 }}>
                         <Button

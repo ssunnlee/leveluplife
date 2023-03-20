@@ -40,9 +40,9 @@ const Tab = createBottomTabNavigator();
 function HomeStack() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Update Info" component={UpdateInfo} />
       <Tab.Screen name="Intake" component={Intake} />
       <Tab.Screen name="Recommended Menu" component={Menu} />
+      <Tab.Screen name="Update Info" component={UpdateInfo} />
     </Tab.Navigator>
   );
 }
