@@ -36,7 +36,7 @@ export default class UpdateInfo extends Component {
         return (
             <KeyboardAvoidingView behavior="padding" style={styles.container}>
                 <View style={styles.formContainer}>
-                    <Text style={styles.title}>Welcome to LevelUpLife</Text>
+                    <Text style={styles.title}>Update Information</Text>
                     <View style={styles.InfoFormContainer}>
                         <TextInput
                             placeholder="Name"
@@ -74,7 +74,7 @@ export default class UpdateInfo extends Component {
                             keyboardType="numeric"
                         />
                         <TextInput
-                            placeholder="Gender (Male or Female)"
+                            placeholder="Gender (male or female)"
                             returnKeyType="go"
                             onChangeText={(gender) => this.setState({ gender })}
                             style={styles.input}

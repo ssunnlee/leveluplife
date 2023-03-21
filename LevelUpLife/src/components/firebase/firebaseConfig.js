@@ -144,7 +144,7 @@ export const updateUserModel = (uid, name, age, height, weight, gender) => {
   });
 };
 
-const userIntakerHelper = async (section, uid) => {
+export const userIntakerHelper = async (section, uid) => {
   try {
     var db = database;
     const snapshot = await get(child(ref(db), `${section}/` + uid));
@@ -181,11 +181,16 @@ const ageToRange = (age) => {
 };
 
 export const getSummary = async (uid) => {
+  console.log("getting summary for", uid)
   var counter = await userIntakerHelper("counter", uid);
   var currentDay = counter.dayCounter;
-  const firstDayIndex = currentDay - 7;
+  const firstDayIndex = currentDay > 7 ? currentDay - 7 : 0;
   const intakes = await userIntakerHelper("intakes", uid);
   const thresholds = await thresholdsHelper("thresholds", uid);
+  console.log(thresholds == null);
+  console.log(thresholds);
+  console.log("intakes", intakes);
+  console.log("printing thresholds");
   const userParams = await userIntakerHelper("userParams", uid);
   const ageRangeString = ageToRange(userParams.age);
   const genderString = userParams.gender;
@@ -201,16 +206,24 @@ export const getSummary = async (uid) => {
   //diet=low-carb&diet=low-fat
   var dietParamString = "";
   var maxCalorieMeal = "";
+  console.log(intakes);
 
   for (var [intakeType, intakeAmt] of Object.entries(intakes)) {
     if (intakeType == "calories") {
+      days = 0;
       for (let i = firstDayIndex; i < currentDay; i++) {
         avgCalories += intakeAmt[i];
+        days++;
+        console.log("avgCalories", avgCalories, i);
       }
 
-      avgCalories = Math.floor(avgCalories / 7);
+      days = days > 0 ? days : 1;
+
+      avgCalories = Math.floor(avgCalories / days);
 
       var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
+      console.log("thresholdAmt", thresholdAmt);
+      console.log("avgCalories", avgCalories);
 
       var percentage = Math.floor((avgCalories / thresholdAmt) * 100);
       maxCalorieMeal = `0-${Math.floor(thresholdAmt) / 3}`;
@@ -223,7 +236,7 @@ export const getSummary = async (uid) => {
         avgCholesterol += intakeAmt[i];
       }
 
-      avgCholesterol = Math.floor(avgCholesterol / 7);
+      avgCholesterol = Math.floor(avgCholesterol / days);
 
       var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
       var percentage = Math.floor((avgCholesterol / thresholdAmt) * 100);
@@ -235,7 +248,7 @@ export const getSummary = async (uid) => {
       for (let i = firstDayIndex; i < currentDay; i++) {
         avgFat += intakeAmt[i];
       }
-      avgFat = Math.floor(avgFat / 7);
+      avgFat = Math.floor(avgFat / days);
 
       var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
       var percentage = Math.floor((avgFat / thresholdAmt) * 100);
@@ -252,7 +265,7 @@ export const getSummary = async (uid) => {
         avgProtein += intakeAmt[i];
       }
 
-      avgProtein = Math.floor(avgProtein / 7);
+      avgProtein = Math.floor(avgProtein / days);
 
       var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
       var percentage = Math.floor((avgProtein / thresholdAmt) * 100);
@@ -267,7 +280,7 @@ export const getSummary = async (uid) => {
       for (let i = firstDayIndex; i < currentDay; i++) {
         avgFiber += intakeAmt[i];
       }
-      avgFiber = Math.floor(avgFiber / 7);
+      avgFiber = Math.floor(avgFiber / days);
 
       var thresholdAmt = thresholds[genderString][ageRangeString][intakeType];
       var percentage = Math.floor((avgFiber / thresholdAmt) * 100);
@@ -281,28 +294,42 @@ export const getSummary = async (uid) => {
 
   //console.log(resultString);
   var dataDictionary = {};
-  const threeRecipesData = getEdamamData(dietParamString, maxCalorieMeal);
-  dataDictionary["threeRecipesData"] = threeRecipesData;
+  console.log(dietParamString);
+  console.log(maxCalorieMeal);
+  const threeRecipesDataPromise = await getEdamamData(dietParamString, maxCalorieMeal);
+  console.log("bruh", typeof (threeRecipesDataPromise));
+  console.log("bruh", threeRecipesDataPromise);
+
+  //threeRecipesDataPromise.then((recipes) => dataDictionary["threeRecipesData"] = recipes);
+  //threeRecipesDataPromise.catch((error) => console.log(error.code, error.message));
   dataDictionary["summaryString"] = resultString;
 
+  console.log("returning dictionary");
   return dataDictionary;
 };
 
 const checkThresholds = async (uid) => {
+  console.log("checking thresholds");
   var counter = await userIntakerHelper("counter", uid);
   const intakes = await userIntakerHelper("intakes", uid);
-  const thresholds = await thresholdsHelper("thresholds");
   const userParams = await userIntakerHelper("userParams", uid);
   var recString = "Recommendations:\n";
   counter = counter.dayCounter;
   const ageRangeString = ageToRange(userParams.age);
   const genderString = userParams.gender;
+  const thresholds = await thresholdsHelper("thresholds");
   for (var [intakeType, intakeAmt] of Object.entries(intakes)) {
+    console.log(intakeType);
     if (intakeType == "calories") {
-      if (
-        intakeAmt[counter] >
-        thresholds[genderString][ageRangeString][intakeType]
-      ) {
+      console.log(thresholds == null);
+      console.log(counter == null);
+      console.log("thresholds", thresholds);
+      console.log("gender", genderString);
+      console.log("age", ageRangeString);
+      console.log("counter", counter);
+      console.log("intakeamt", intakeAmt);
+      if (intakeAmt[counter] > thresholds[genderString][ageRangeString][intakeType]) {
+        console.log("safe");
         recString = recString.concat(
           `You have exceeded the recommended daily limit of calories(${thresholds[genderString][ageRangeString][intakeType]} cal)\n`
         );
@@ -441,20 +468,20 @@ export const userIntake = async (
 
   if (initIntake == 0) {
     // TODO: fix date system, currently rewrites over data every month
-    set(ref(db, "counter/" + uid), {
+    await set(ref(db, "counter/" + uid), {
       firstIntake: 0,
       dayCounter: 0,
       currentDay: currentDay,
     });
 
-    set(ref(db, "intakes/" + uid), {
+    await set(ref(db, "intakes/" + uid), {
       fat: { [dayCounter]: fat },
       protein: { [dayCounter]: protein },
       fiber: { [dayCounter]: fiber },
       cholesterol: { [dayCounter]: cholesterol },
       calories: { [dayCounter]: calories },
     });
-    set(ref(db, "counter/" + uid), {
+    await set(ref(db, "counter/" + uid), {
       dayCounter: 0,
       firstIntake: 1,
       currentDay: currentDay,
@@ -462,7 +489,7 @@ export const userIntake = async (
   } else {
     const currentDayData = await userIntakerHelper("counter", uid);
     if (currentDayData.currentDay != currentDay) {
-      set(ref(db, "counter/" + uid), {
+      await set(ref(db, "counter/" + uid), {
         dayCounter: currentDayData.dayCounter + 1,
         firstIntake: 1,
         currentDay: currentDay,
@@ -477,10 +504,10 @@ export const userIntake = async (
             const newValue = eval(key) + parseInt(eval(value[dayCounter]));
             const updates = {};
             if (value[dayCounter] != null) {
-              updates["/intakes/" + key + "/" + dayCounter] = newValue;
+              updates["/intakes/" + uid + "/" + key + "/" + dayCounter] = newValue;
               update(ref(db), updates);
             } else {
-              updates["/intakes/" + key + "/" + dayCounter] = eval(key);
+              updates["/intakes/" + uid + "/" + key + "/" + dayCounter] = eval(key);
               update(ref(db), updates);
             }
           }

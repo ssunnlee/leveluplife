@@ -42,28 +42,10 @@ export default class Register extends Component {
             const errorCode = error.code;
             const errorMessage = error.message;
             console.log(errorCode, errorMessage);
+            Alert.alert('Register', errorMessage, [
+                { text: 'OK' },
+            ]);
         })
-        /* createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                updateProfile(user, {
-                    displayName: username
-                }).then(console.log("success in username change")).catch(console.log("oh no"))
-
-                console.log(user.displayName);
-
-                this.contextType.setUser(user);
-
-                this.props.navigation.navigate("Info");
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage);
-                Alert.alert('Register', errorMessage, [
-                    { text: 'OK' },
-                ]);
-            }); */
     }
 
     render() {

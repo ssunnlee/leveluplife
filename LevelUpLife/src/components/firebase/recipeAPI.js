@@ -1,4 +1,4 @@
-export const getEdamamData = (dietParams, calories) => {
+export const getEdamamData = async (dietParams, calories) => {
   const app_key = "72e6bd9b5b1aea4ede7eefefc7c7a623";
   const app_id = "b1e4fb06";
 
@@ -31,9 +31,8 @@ export const getEdamamData = (dietParams, calories) => {
         var ingredients = "";
 
         for (let j = 0; j < sortedData[i].recipe.ingredients.length; j++) {
-          ingredients += `${j + 1}. ${
-            sortedData[i].recipe.ingredients[j].text
-          }\n`;
+          ingredients += `${j + 1}. ${sortedData[i].recipe.ingredients[j].text
+            }\n`;
         }
 
         var obj = {};
@@ -55,9 +54,16 @@ export const getEdamamData = (dietParams, calories) => {
       //     console.log("----------------------------------------------------");
       //     console.log(object3[i].label);
       //   }
+      //console.log("returning object3", object3);
+      console.log("returning");
       return object3;
     })
-    .catch(function () {
+    .catch(function (error) {
       // catch any errors
+      console.log(error.code, error.message);
+      Alert.alert('Recipe Error', 'An error occured while getting your recipe', [
+        { text: 'OK' },
+      ]);
     });
+  console.log("finishing");
 };

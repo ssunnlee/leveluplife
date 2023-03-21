@@ -71,7 +71,7 @@ export default class Info extends Component {
                             keyboardType="numeric"
                         />
                         <TextInput
-                            placeholder="Gender (Male or Female)"
+                            placeholder="Gender (male or female)"
                             returnKeyType="go"
                             onChangeText={(gender) => this.setState({ gender })}
                             style={styles.input}

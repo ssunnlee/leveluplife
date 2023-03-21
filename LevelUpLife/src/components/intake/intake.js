@@ -17,15 +17,15 @@ export default class Intake extends Component {
     }
 
     recordData = async (fat, protein, fiber, ch, cal) => {
-        //const user = UserContext.user;
-        //const st = await userIntake(user.uid, fat, protein, fiber, parseInt(ch), cal);
+        const user = this.context.user;
+        const st = await userIntake(user.uid, parseInt(fat), parseInt(protein), parseInt(fiber), parseInt(ch), parseInt(cal));
         //console.log(st);
         console.log("User fat is " + fat);
         console.log("User protein is " + protein);
         console.log("User fiber is " + fiber);
         console.log("User cholesterol is " + ch);
         console.log("User calories is " + cal);
-        //Alert.alert("Notification", st);
+        Alert.alert("Notification", st);
         //this.props.navigation.goBack();
     }
 
