@@ -5,7 +5,7 @@ export const getEdamamData = async (dietParams, calories) => {
   const API_URL = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${app_id}&app_key=${app_key}&${dietParams}mealType=Breakfast&mealType=Dinner&mealType=Lunch&dishType=Main%20course&calories=${calories}&imageSize=THUMBNAIL&random=true&nutrients%5BCHOLE%5D=0-100&field=label&field=ingredients&field=image&field=source&field=url&field=calories&field=totalNutrients&field=yield`;
   const API_json = await (await fetch(API_URL)).json();
   var sortedData = await API_json.hits;
-  await sortedData.sort((a, b) => {
+  sortedData.sort((a, b) => {
     return (
       a.recipe.calories / a.recipe.yield -
       b.recipe.calories / b.recipe.yield
@@ -25,12 +25,12 @@ export const getEdamamData = async (dietParams, calories) => {
 
     var obj = {};
 
-    obj["label"] = await sortedData[i].recipe.label;
+    obj["label"] = sortedData[i].recipe.label;
     obj["ingredientString"] = ingredients;
-    obj["image"] = await sortedData[i].recipe.image;
-    obj["url"] = await sortedData[i].recipe.url;
+    obj["image"] = sortedData[i].recipe.image;
+    obj["url"] = sortedData[i].recipe.url;
 
-    await object3.push(obj);
+    object3.push(obj);
   }
 
   return object3;

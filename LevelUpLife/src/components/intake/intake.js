@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Button, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import { userIntake } from '../firebase/firebaseConfig';
+import { userIntake, getSummary } from '../firebase/firebaseConfig';
 import { UserContext } from '../../../UserContext';
 
 export default class Intake extends Component {
@@ -27,6 +27,13 @@ export default class Intake extends Component {
         console.log("User calories is " + cal);
         Alert.alert("Notification", st);
         //this.props.navigation.goBack();
+    }
+
+    showSummary = async () => {
+        summary = await getSummary(this.context.user.uid);
+        Alert.alert('Summary', summary.summaryString, [
+            { text: 'OK' },
+        ]);
     }
 
     render() {
@@ -87,6 +94,13 @@ export default class Intake extends Component {
                                 title="Enter"
                                 color="#3C6435"
                                 onPress={() => this.recordData(this.state.fat, this.state.protein, this.state.fiber, this.state.ch, this.state.cal)}
+                            />
+                        </View>
+                        <View style={{ borderRadius: 20, width: 200, height: 50, alignSelf: 'center', marginBottom: 20, backgroundColor: 'white', borderWidth: 2, justifyContent: 'center', textAlign: 'center', margin: 10 }}>
+                            <Button
+                                title="Weekly Summary"
+                                color="#3C6435"
+                                onPress={() => this.showSummary()}
                             />
                         </View>
                     </View>

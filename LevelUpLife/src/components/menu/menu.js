@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, Button, TextInput, Alert, Image, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Button, Linking, Alert, Image, ScrollView } from 'react-native';
 import { userIntakeHelper, getSummary } from '../firebase/firebaseConfig'
 import { UserContext } from '../../../UserContext';
 import { getAuth } from "firebase/auth";
 //import { getEdamamData } from "../firebase/recipeAPI";
+
+//import ReactDOM from "react-dom";
 
 
 export default class Menu extends Component {
@@ -20,6 +22,9 @@ export default class Menu extends Component {
         //const user = this.context.user;
         const auth = getAuth();
         this.state.user = auth.currentUser;
+
+        this.recordSummary();
+        var j = 0
         /* await getSummary(user.uid).then((summary) => {
             this.state.summary = summary;
             console.log("summary", summary);
@@ -47,7 +52,6 @@ export default class Menu extends Component {
     }
 
     componentDidMount() {
-        this.recordSummary();
     }
 
     render() {
@@ -55,14 +59,24 @@ export default class Menu extends Component {
         //await this.recordSummary(this.state.user.uid);
         //console.log("this is important1", this.state.summary.threeRecipesData[0].image);
         return (
-            < ScrollView behavior="padding" style={styles.container} >
+            this.state.loaded ? < ScrollView behavior="padding" style={styles.container} >
                 <View style={styles.formContainer}>
                     <Text style={styles.title}>Recommended Menus</Text>
                     <View style={styles.InfoFormContainer}>
                         <Text style={styles.info}>{this.state.summary.threeRecipesData[0].label}</Text>
-                        <Text style={styles.info}>{this.state.summary.threeRecipesData[0].ingredientString}</Text>
-                        <Image style={styles.sampleImage} source={{ uri: 'https://www.kitchensanctuary.com/wp-content/uploads/2021/09/How-to-cook-the-perfect-steak-tall-FS.webp' }}></Image>
-                        <Image style={styles.sampleImage} source={{ uri: this.state.summary.threeRecipesData[0].image }}></Image>
+                        <Text style={styles.info}>Ingredients</Text>
+                        <Text>{this.state.summary.threeRecipesData[0].ingredientString}</Text>
+                        <Image style={styles.sampleImage} source={{ uri: this.state.summary.threeRecipesData[0].image }} onPress={() => Linking.openURL(this.state.summary.threeRecipesData[0].url)}></Image>
+
+                        <Text style={styles.info}>{this.state.summary.threeRecipesData[1].label}</Text>
+                        <Text style={styles.info}>Ingredients</Text>
+                        <Text>{this.state.summary.threeRecipesData[1].ingredientString}</Text>
+                        <Image style={styles.sampleImage} source={{ uri: this.state.summary.threeRecipesData[1].image }} onPress={() => Linking.openURL(this.state.summary.threeRecipesData[1].url)}></Image>
+
+                        <Text style={styles.info}>{this.state.summary.threeRecipesData[2].label}</Text>
+                        <Text style={styles.info}>Ingredients</Text>
+                        <Text>{this.state.summary.threeRecipesData[2].ingredientString}</Text>
+                        <Image style={styles.sampleImage} source={{ uri: this.state.summary.threeRecipesData[2].image }} onPress={() => Linking.openURL(this.state.summary.threeRecipesData[2].url)}></Image>
                     </View>
                     <View style={{ borderRadius: 20, width: 120, height: 50, alignSelf: 'center', marginBottom: 20, backgroundColor: 'white', borderWidth: 2, justifyContent: 'center', textAlign: 'center', margin: 10 }}>
                         <Button
@@ -73,6 +87,7 @@ export default class Menu extends Component {
                     </View>
                 </View>
             </ScrollView >
+                : <Text>Loading...</Text>
         );
     }
 }
@@ -121,6 +136,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         width: 300,
         height: 300,
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
 });
