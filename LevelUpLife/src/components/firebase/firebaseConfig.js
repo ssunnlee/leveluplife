@@ -296,12 +296,10 @@ export const getSummary = async (uid) => {
   var dataDictionary = {};
   console.log(dietParamString);
   console.log(maxCalorieMeal);
-  const threeRecipesDataPromise = await getEdamamData(dietParamString, maxCalorieMeal);
-  console.log("bruh", typeof (threeRecipesDataPromise));
-  console.log("bruh", threeRecipesDataPromise);
+  const threeRecipesData = await getEdamamData(dietParamString, maxCalorieMeal);
+  console.log("bruh", typeof (threeRecipesData));
 
-  //threeRecipesDataPromise.then((recipes) => dataDictionary["threeRecipesData"] = recipes);
-  //threeRecipesDataPromise.catch((error) => console.log(error.code, error.message));
+  dataDictionary["threeRecipesData"] = threeRecipesData
   dataDictionary["summaryString"] = resultString;
 
   console.log("returning dictionary");

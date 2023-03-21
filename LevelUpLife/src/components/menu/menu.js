@@ -11,17 +11,31 @@ export default class Menu extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            summary: {}
+            summary: {
+                threeRecipesData: [{ label: "", image: "" }]
+            },
+            user: null,
+            loaded: false
         }
         //const user = this.context.user;
         const auth = getAuth();
-        const user = auth.currentUser;
-        getSummary(user.uid).then((summary) => {
+        this.state.user = auth.currentUser;
+        /* await getSummary(user.uid).then((summary) => {
             this.state.summary = summary;
-            console.log("got the summary", this.state.summary);
+            console.log("summary", summary);
         }).catch((error) => {
             console.log(error.code, error.message);
         }).finally(() => console.log("what"))
+        console.log("uid is", user.uid);
+        this.recordSummary(user.uid).then(() => {
+            console.log("this is important", this.state.summary.threeRecipesData);
+            console.log("this is important1", this.state.summary.threeRecipesData[0].image);
+        }); */
+    }
+
+    recordSummary = async () => {
+        this.state.summary = await getSummary(this.state.user.uid);
+        this.state.loaded = true;
     }
 
     recordData = () => {
@@ -32,14 +46,21 @@ export default class Menu extends Component {
     nextItem = () => {
     }
 
+    componentDidMount() {
+        this.recordSummary();
+    }
+
     render() {
+
+        //await this.recordSummary(this.state.user.uid);
+        //console.log("this is important1", this.state.summary.threeRecipesData[0].image);
         return (
-            <ScrollView behavior="padding" style={styles.container}>
+            < ScrollView behavior="padding" style={styles.container} >
                 <View style={styles.formContainer}>
                     <Text style={styles.title}>Recommended Menus</Text>
                     <View style={styles.InfoFormContainer}>
-                        <Text style={styles.info}>this.state.summary.threeRecipesData[0].label</Text>
-                        <Text style={styles.info}>this.state.summary.threeRecipesData[0].ingredientString</Text>
+                        <Text style={styles.info}>{this.state.summary.threeRecipesData[0].label}</Text>
+                        <Text style={styles.info}>{this.state.summary.threeRecipesData[0].ingredientString}</Text>
                         <Image style={styles.sampleImage} source={{ uri: 'https://www.kitchensanctuary.com/wp-content/uploads/2021/09/How-to-cook-the-perfect-steak-tall-FS.webp' }}></Image>
                         <Image style={styles.sampleImage} source={{ uri: this.state.summary.threeRecipesData[0].image }}></Image>
                     </View>
